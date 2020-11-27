@@ -110,7 +110,7 @@
 
     - name: Copy github-runner.sh
       copy:
-        src: files/github-runner.sh
+        src: github-runner.sh
         dest: /etc/github-runner/github-runner.sh
         owner: root
         group: root
@@ -118,11 +118,33 @@
 
     - name: Copy github-runner-script.service
       copy:
-        src: files/github-runner-script.service
+        src: github-runner-script.service
         dest: /etc/systemd/system/github-runner-script.service
         owner: root
         group: root
         mode: "0644"
+
+    - name: Download github-runner
+      get_url:
+        url: https://github.com/XenitAB/github-runner/releases/download/0.2.0/github-runner
+        dest: /etc/github-runner/github-runner
+        checksum: sha256:46dfbaceab1ad2f5f3738776a37662674465a21b97ce39be70f974da6a419528
+
+    - name: Make github-runner executable
+      file:
+        dest: /etc/github-runner/github-runner
+        mode: a+x
+
+    - name: Download actions-runner archive
+      get_url:
+        url: https://github.com/actions/runner/releases/download/v2.274.2/actions-runner-linux-x64-2.274.2.tar.gz
+        dest: /etc/github-runner/actions-runner.tar.gz
+        checksum: sha256:599265a0d520d8fddd3e9579cd91ea78a5c195fdb7cbf62c89597f2bbd9947a6
+
+    - name: Extract actions-runner archive
+      unarchive:
+        src: /etc/github-runner/actions-runner.tar.gz
+        dest: /etc/github-runner
 
     - name: Enable github-runner-script.service
       systemd:
