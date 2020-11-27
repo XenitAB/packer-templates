@@ -4,6 +4,9 @@ set -ex
 
 while [ $# -gt 0 ]; do
   case "$1" in
+    --action=*)
+      ACTION="${1#*=}"
+      ;;
     --config-file=*)
       CONFIG_FILE="${1#*=}"
       ;;
@@ -27,6 +30,20 @@ while [ $# -gt 0 ]; do
   esac
   shift
 done
+
+
+if [[ -z ${ACTION} ]]; then
+    echo Setting action to REGISTER by default
+    ACTION="REGISTER"
+elif [[ "${ACTION}" == "REGISTER" ]];
+    echo Action is REGISTER
+elif [[ "${ACTION}" == "REMOVE" ]];
+    echo Action is REMOVE
+else
+    echo ERROR: Unknown action: ${ACTION}
+    echo Use --action REGISTER or REMOVE
+    exit 1
+fi
 
 
 if [[ -z ${CONFIG_FILE} ]]; then
@@ -55,19 +72,25 @@ GITHUB_APP_ID_KVSECRET=$(cat ${CONFIG_FILE} | jq -r .GITHUB_APP_ID_KVSECRET)
 GITHUB_INSTALLATION_ID_KVSECRET=$(cat ${CONFIG_FILE} | jq -r .GITHUB_INSTALLATION_ID_KVSECRET)
 GITHUB_PRIVATE_KEY_KVSECRET=$(cat ${CONFIG_FILE} | jq -r .GITHUB_PRIVATE_KEY_KVSECRET)
 
-GITHUB_RUNNER_OUTPUT=$(${GITHUB_RUNNER_BINARY} --use-azure-keyvault --azure-keyvault-name ${AZURE_KEYVAULT_NAME} --organization-kvsecret ${GITHUB_ORGANIZATION_KVSECRET} --app-id-kvsecret ${GITHUB_APP_ID_KVSECRET} --installation-id-kvsecret ${GITHUB_INSTALLATION_ID_KVSECRET} --private-key-kvsecret ${GITHUB_PRIVATE_KEY_KVSECRET} --azure-auth ${AZURE_AUTHENTICATION_METHOD} --output JSON)
-GITHUB_RUNNER_ORGANIZATION=$(echo ${GITHUB_RUNNER_OUTPUT} | jq -r .organization)
-GITHUB_RUNNER_TOKEN=$(echo ${GITHUB_RUNNER_OUTPUT} | jq -r .token)
+if [[ "${ACTION}" == "REGISTER" ]];
+    GITHUB_RUNNER_OUTPUT=$(${GITHUB_RUNNER_BINARY} --value-source AZURE_KEYVAULT --azure-keyvault-name ${AZURE_KEYVAULT_NAME} --organization-kvsecret ${GITHUB_ORGANIZATION_KVSECRET} --app-id-kvsecret ${GITHUB_APP_ID_KVSECRET} --installation-id-kvsecret ${GITHUB_INSTALLATION_ID_KVSECRET} --private-key-kvsecret ${GITHUB_PRIVATE_KEY_KVSECRET} --azure-auth ${AZURE_AUTHENTICATION_METHOD} --output JSON)
+    GITHUB_RUNNER_ORGANIZATION=$(echo ${GITHUB_RUNNER_OUTPUT} | jq -r .organization)
+    GITHUB_RUNNER_REGISTER_TOKEN=$(echo ${GITHUB_RUNNER_OUTPUT} | jq -r .token)
+    if id ghrunner &>/dev/null; then
+        echo "User ghrunner already exists"
+    else
+        echo "Creating user ghrunner"
+        useradd -s /bin/bash -d /home/ghrunner/ -m ghrunner
+    fi
 
-if id ghrunner &>/dev/null; then
-    echo "User ghrunner already exists"
-else
-    echo "Creating user ghrunner"
-    useradd -s /bin/bash -d /home/ghrunner/ -m ghrunner
+    chown -R ghrunner:ghrunner /etc/github-runner
+
+    runuser -l ghrunner -c "${GITHUB_RUNNER_CONFIG_SCRIPT} --url https://github.com/${GITHUB_RUNNER_ORGANIZATION} --token ${GITHUB_RUNNER_REGISTER_TOKEN} --name $(hostname) --work /home/ghrunner --unattended --replace"
+    ${GITHUB_RUNNER_SERVICE_SCRIPT} install ghrunner
+    ${GITHUB_RUNNER_SERVICE_SCRIPT} start
+elif [[ "${ACTION}" == "REMOVE" ]];
+    GITHUB_RUNNER_OUTPUT=$(${GITHUB_RUNNER_BINARY} --value-source AZURE_KEYVAULT --azure-keyvault-name ${AZURE_KEYVAULT_NAME} --organization-kvsecret ${GITHUB_ORGANIZATION_KVSECRET} --app-id-kvsecret ${GITHUB_APP_ID_KVSECRET} --installation-id-kvsecret ${GITHUB_INSTALLATION_ID_KVSECRET} --private-key-kvsecret ${GITHUB_PRIVATE_KEY_KVSECRET} --azure-auth ${AZURE_AUTHENTICATION_METHOD} --output JSON --token-type REMOVE)
+    GITHUB_RUNNER_REMOVE_TOKEN=$(echo ${GITHUB_RUNNER_OUTPUT} | jq -r .token)
+    ${GITHUB_RUNNER_SERVICE_SCRIPT} uninstall
+    runuser -l ghrunner -c "${GITHUB_RUNNER_CONFIG_SCRIPT} remove --unattended --token ${GITHUB_RUNNER_REMOVE_TOKEN}"
 fi
-
-chown -R ghrunner:ghrunner /etc/github-runner
-
-runuser -l ghrunner -c "${GITHUB_RUNNER_CONFIG_SCRIPT} --url https://github.com/${GITHUB_RUNNER_ORGANIZATION} --token ${GITHUB_RUNNER_TOKEN} --name $(hostname) --work /home/ghrunner --unattended --replace"
-${GITHUB_RUNNER_SERVICE_SCRIPT} install ghrunner
-${GITHUB_RUNNER_SERVICE_SCRIPT} start

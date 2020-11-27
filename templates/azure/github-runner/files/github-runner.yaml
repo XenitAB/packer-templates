@@ -116,19 +116,19 @@
         group: root
         mode: "0744"
 
-    - name: Copy github-runner-script.service
+    - name: Copy github-runner.service
       copy:
-        src: github-runner-script.service
-        dest: /etc/systemd/system/github-runner-script.service
+        src: github-runner.service
+        dest: /etc/systemd/system/github-runner.service
         owner: root
         group: root
         mode: "0644"
 
     - name: Download github-runner
       get_url:
-        url: https://github.com/XenitAB/github-runner/releases/download/0.2.0/github-runner
+        url: https://github.com/XenitAB/github-runner/releases/download/0.3.0/github-runner
         dest: /etc/github-runner/github-runner
-        checksum: sha256:46dfbaceab1ad2f5f3738776a37662674465a21b97ce39be70f974da6a419528
+        checksum: sha256:ac113b02254d0b7893d358a53179ca8d1a4d7a5a2be4b561200eef98b4a45b1a
 
     - name: Make github-runner executable
       file:
