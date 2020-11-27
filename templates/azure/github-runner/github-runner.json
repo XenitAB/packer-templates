@@ -1,0 +1,41 @@
+{
+  "variables": {
+    "AZURE_RESOURCE_GROUP_NAME": "rg-dev-we-hub"
+  },
+  "builders": [
+    {
+      "type": "azure-arm",
+      "use_azure_cli_auth": true,
+      "managed_image_resource_group_name": "{{user `AZURE_RESOURCE_GROUP_NAME`}}",
+      "managed_image_name": "azp-agent-{{isotime | clean_resource_name}}",
+      "build_resource_group_name": "{{user `AZURE_RESOURCE_GROUP_NAME`}}",
+      "os_type": "Linux",
+      "image_publisher": "Canonical",
+      "image_offer": "UbuntuServer",
+      "image_sku": "18.04-LTS",
+      "vm_size": "Standard_DS2_v2"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done"
+      ]
+    },
+    {
+      "type": "ansible",
+      "use_proxy": false,
+      "playbook_file": "{{template_dir}}/files/ubuntu1804-ansible.yaml"
+    },
+    {
+      "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo -E sh '{{ .Path }}'",
+      "inline": [
+        "/usr/sbin/waagent -force -deprovision+user && export HISTSIZE=0 && sync"
+      ],
+      "inline_shebang": "/bin/sh -x",
+      "type": "shell",
+      "environment_vars": ["DEBIAN_FRONTEND=noninteractive"]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "AZURE_KEYVAULT_NAME": "keyvault-name",
+  "GITHUB_ORGANIZATION_KVSECRET": "github-organization",
+  "GITHUB_APP_ID_KVSECRET": "github-app-id",
+  "GITHUB_INSTALLATION_ID_KVSECRET": "github-installation-id",
+  "GITHUB_PRIVATE_KEY_KVSECRET": "github-private-key"
+}
