@@ -143,6 +143,7 @@
 
     - name: Extract actions-runner archive
       unarchive:
+        remote_src: yes
         src: /etc/github-runner/actions-runner.tar.gz
         dest: /etc/github-runner
 
