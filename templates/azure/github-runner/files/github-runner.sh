@@ -35,9 +35,9 @@ done
 if [[ -z ${ACTION} ]]; then
     echo Setting action to REGISTER by default
     ACTION="REGISTER"
-elif [[ "${ACTION}" == "REGISTER" ]];
+elif [[ "${ACTION}" == "REGISTER" ]]; then
     echo Action is REGISTER
-elif [[ "${ACTION}" == "REMOVE" ]];
+elif [[ "${ACTION}" == "REMOVE" ]]; then
     echo Action is REMOVE
 else
     echo ERROR: Unknown action: ${ACTION}
@@ -72,7 +72,7 @@ GITHUB_APP_ID_KVSECRET=$(cat ${CONFIG_FILE} | jq -r .GITHUB_APP_ID_KVSECRET)
 GITHUB_INSTALLATION_ID_KVSECRET=$(cat ${CONFIG_FILE} | jq -r .GITHUB_INSTALLATION_ID_KVSECRET)
 GITHUB_PRIVATE_KEY_KVSECRET=$(cat ${CONFIG_FILE} | jq -r .GITHUB_PRIVATE_KEY_KVSECRET)
 
-if [[ "${ACTION}" == "REGISTER" ]];
+if [[ "${ACTION}" == "REGISTER" ]]; then
     GITHUB_RUNNER_OUTPUT=$(${GITHUB_RUNNER_BINARY} --value-source AZURE_KEYVAULT --azure-keyvault-name ${AZURE_KEYVAULT_NAME} --organization-kvsecret ${GITHUB_ORGANIZATION_KVSECRET} --app-id-kvsecret ${GITHUB_APP_ID_KVSECRET} --installation-id-kvsecret ${GITHUB_INSTALLATION_ID_KVSECRET} --private-key-kvsecret ${GITHUB_PRIVATE_KEY_KVSECRET} --azure-auth ${AZURE_AUTHENTICATION_METHOD} --output JSON)
     GITHUB_RUNNER_ORGANIZATION=$(echo ${GITHUB_RUNNER_OUTPUT} | jq -r .organization)
     GITHUB_RUNNER_REGISTER_TOKEN=$(echo ${GITHUB_RUNNER_OUTPUT} | jq -r .token)
@@ -88,7 +88,7 @@ if [[ "${ACTION}" == "REGISTER" ]];
     runuser -l ghrunner -c "${GITHUB_RUNNER_CONFIG_SCRIPT} --url https://github.com/${GITHUB_RUNNER_ORGANIZATION} --token ${GITHUB_RUNNER_REGISTER_TOKEN} --name $(hostname) --work /home/ghrunner --unattended --replace"
     ${GITHUB_RUNNER_SERVICE_SCRIPT} install ghrunner
     ${GITHUB_RUNNER_SERVICE_SCRIPT} start
-elif [[ "${ACTION}" == "REMOVE" ]];
+elif [[ "${ACTION}" == "REMOVE" ]]; then
     GITHUB_RUNNER_OUTPUT=$(${GITHUB_RUNNER_BINARY} --value-source AZURE_KEYVAULT --azure-keyvault-name ${AZURE_KEYVAULT_NAME} --organization-kvsecret ${GITHUB_ORGANIZATION_KVSECRET} --app-id-kvsecret ${GITHUB_APP_ID_KVSECRET} --installation-id-kvsecret ${GITHUB_INSTALLATION_ID_KVSECRET} --private-key-kvsecret ${GITHUB_PRIVATE_KEY_KVSECRET} --azure-auth ${AZURE_AUTHENTICATION_METHOD} --output JSON --token-type REMOVE)
     GITHUB_RUNNER_REMOVE_TOKEN=$(echo ${GITHUB_RUNNER_OUTPUT} | jq -r .token)
     ${GITHUB_RUNNER_SERVICE_SCRIPT} uninstall
