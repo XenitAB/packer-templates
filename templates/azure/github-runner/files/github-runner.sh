@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -ex
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -59,6 +59,15 @@ GITHUB_RUNNER_OUTPUT=$(${GITHUB_RUNNER_BINARY} --use-azure-keyvault --azure-keyv
 GITHUB_RUNNER_ORGANIZATION=$(echo ${GITHUB_RUNNER_OUTPUT} | jq -r .organization)
 GITHUB_RUNNER_TOKEN=$(echo ${GITHUB_RUNNER_OUTPUT} | jq -r .token)
 
-${GITHUB_RUNNER_CONFIG_SCRIPT} --url https://github.com/${GITHUB_RUNNER_ORGANIZATION} --token ${GITHUB_RUNNER_TOKEN}
-${GITHUB_RUNNER_SERVICE_SCRIPT} install
+if id ghrunner &>/dev/null; then
+    echo "User ghrunner already exists"
+else
+    echo "Creating user ghrunner"
+    useradd -s /bin/bash -d /home/ghrunner/ -m ghrunner
+fi
+
+chown -R ghrunner:ghrunner /etc/github-runner
+
+runuser -l ghrunner -c "${GITHUB_RUNNER_CONFIG_SCRIPT} --url https://github.com/${GITHUB_RUNNER_ORGANIZATION} --token ${GITHUB_RUNNER_TOKEN} --name $(hostname) --work /home/ghrunner --unattended --replace"
+${GITHUB_RUNNER_SERVICE_SCRIPT} install ghrunner
 ${GITHUB_RUNNER_SERVICE_SCRIPT} start
