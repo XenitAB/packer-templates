@@ -124,6 +124,11 @@
         group: root
         mode: "0644"
 
+    - name: Enable github-runner.service
+      systemd:
+        name: github-runner.service
+        enabled: yes
+
     - name: Download github-runner
       get_url:
         url: https://github.com/XenitAB/github-runner/releases/download/0.3.0/github-runner
@@ -146,11 +151,6 @@
         remote_src: yes
         src: /etc/github-runner/actions-runner.tar.gz
         dest: /etc/github-runner
-
-    - name: Enable github-runner-script.service
-      systemd:
-        name: github-runner-script.service
-        enabled: yes
 
     - name: apt upgrade
       apt:
