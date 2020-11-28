@@ -116,17 +116,30 @@
         group: root
         mode: "0744"
 
-    - name: Copy github-runner.service
+    - name: Copy github-runner-start.service
       copy:
-        src: github-runner.service
-        dest: /etc/systemd/system/github-runner.service
+        src: github-runner-start.service
+        dest: /etc/systemd/system/github-runner-start.service
         owner: root
         group: root
         mode: "0644"
 
-    - name: Enable github-runner.service
+    - name: Enable github-runner-start.service
       systemd:
-        name: github-runner.service
+        name: github-runner-start.service
+        enabled: yes
+
+    - name: Copy github-runner-stop.service
+      copy:
+        src: github-runner-stop.service
+        dest: /etc/systemd/system/github-runner-stop.service
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Enable github-runner-stop.service
+      systemd:
+        name: github-runner-stop.service
         enabled: yes
 
     - name: Download github-runner

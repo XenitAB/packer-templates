@@ -91,6 +91,8 @@ if [[ "${ACTION}" == "REGISTER" ]]; then
 elif [[ "${ACTION}" == "REMOVE" ]]; then
     GITHUB_RUNNER_OUTPUT=$(${GITHUB_RUNNER_BINARY} --value-source AZURE_KEYVAULT --azure-keyvault-name ${AZURE_KEYVAULT_NAME} --organization-kvsecret ${GITHUB_ORGANIZATION_KVSECRET} --app-id-kvsecret ${GITHUB_APP_ID_KVSECRET} --installation-id-kvsecret ${GITHUB_INSTALLATION_ID_KVSECRET} --private-key-kvsecret ${GITHUB_PRIVATE_KEY_KVSECRET} --azure-auth ${AZURE_AUTHENTICATION_METHOD} --output JSON --token-type REMOVE)
     GITHUB_RUNNER_REMOVE_TOKEN=$(echo ${GITHUB_RUNNER_OUTPUT} | jq -r .token)
+    set +e
     ${GITHUB_RUNNER_SERVICE_SCRIPT} uninstall
+    set -e
     runuser -l ghrunner -c "${GITHUB_RUNNER_CONFIG_SCRIPT} remove --unattended --token ${GITHUB_RUNNER_REMOVE_TOKEN}"
 fi

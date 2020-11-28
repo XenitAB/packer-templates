@@ -1,10 +1,11 @@
 [Unit]
-Description=github-runner-script
+Description=github-runner-stop
 After=network.target
 
 [Service]
 Type=oneshot
-ExecStart=/etc/github-runner/github-runner.sh --action=REGISTER
+WorkingDirectory=/etc/github-runner
+RemainAfterExit=true
 ExecStop=/etc/github-runner/github-runner.sh --action=REMOVE
 
 [Install]

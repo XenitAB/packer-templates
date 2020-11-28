@@ -7,7 +7,7 @@
       "type": "azure-arm",
       "use_azure_cli_auth": true,
       "managed_image_resource_group_name": "{{user `AZURE_RESOURCE_GROUP_NAME`}}",
-      "managed_image_name": "azp-agent-{{isotime | clean_resource_name}}",
+      "managed_image_name": "github-runner-{{isotime | clean_resource_name}}",
       "build_resource_group_name": "{{user `AZURE_RESOURCE_GROUP_NAME`}}",
       "os_type": "Linux",
       "image_publisher": "Canonical",
