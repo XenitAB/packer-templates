@@ -165,6 +165,33 @@
         src: /etc/github-runner/actions-runner.tar.gz
         dest: /etc/github-runner
 
+    - name: Create the directory /etc/xenit
+      file:
+        path: /etc/xenit
+        state: directory
+        mode: "0755"
+
+    - name: Copy docker-pull.sh
+      copy:
+        src: docker-pull.sh
+        dest: /etc/xenit/docker-pull.sh
+        owner: root
+        group: root
+        mode: "0744"
+
+    - name: Copy docker-pull.service
+      copy:
+        src: docker-pull.service
+        dest: /etc/systemd/system/docker-pull.service
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Enable docker-pull.service
+      systemd:
+        name: docker-pull.service
+        enabled: yes
+
     - name: apt upgrade
       apt:
         upgrade: yes

@@ -33,7 +33,7 @@
     {
       "type": "ansible",
       "use_proxy": false,
-      "playbook_file": "{{template_dir}}/ubuntu1804-ansible.yaml"
+      "playbook_file": "{{template_dir}}/files/azure-pipelines-agent.yaml"
     },
     {
       "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo -E sh '{{ .Path }}'",
