@@ -1,11 +1,11 @@
 [Unit]
-Description=docker-pull-xenit-tools
+Description=docker-pull
 After=network.target
 
 [Service]
 Type=oneshot
 WorkingDirectory=/etc/xenit
-ExecStart=/etc/xenit/docker-pull-xenit-tools.sh
+ExecStart=/etc/xenit/docker-pull.sh
 
 [Install]
 WantedBy=multi-user.target
