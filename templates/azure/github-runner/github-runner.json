@@ -1,6 +1,6 @@
 {
   "variables": {
-    "AZURE_RESOURCE_GROUP_NAME": "rg-dev-we-hub"
+    "AZURE_RESOURCE_GROUP_NAME": "{{env `AZURE_RESOURCE_GROUP_NAME`}}"
   },
   "builders": [
     {
