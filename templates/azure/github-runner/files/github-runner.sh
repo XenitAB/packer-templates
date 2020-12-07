@@ -83,6 +83,9 @@ if [[ "${ACTION}" == "REGISTER" ]]; then
         useradd -s /bin/bash -d /home/ghrunner/ -m ghrunner
     fi
 
+    usermod -a -G sudo,docker ghrunner
+    echo "ghrunner ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/ghrunner
+
     chown -R ghrunner:ghrunner /etc/github-runner
 
     runuser -l ghrunner -c "${GITHUB_RUNNER_CONFIG_SCRIPT} --url https://github.com/${GITHUB_RUNNER_ORGANIZATION} --token ${GITHUB_RUNNER_REGISTER_TOKEN} --name $(hostname) --work /home/ghrunner --unattended --replace"
