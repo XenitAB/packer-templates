@@ -1,11 +1,15 @@
 [Unit]
 Description=github-runner-start
 After=network.target
+StartLimitIntervalSec=500
+StartLimitBurst=5
 
 [Service]
 Type=oneshot
 WorkingDirectory=/etc/github-runner
 ExecStart=/etc/github-runner/github-runner.sh --action=REGISTER
+Restart=on-failure
+RestartSec=30s
 
 [Install]
 WantedBy=multi-user.target
