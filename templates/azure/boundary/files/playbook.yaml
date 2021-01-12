@@ -1,0 +1,20 @@
+- name: "Provision Image"
+  hosts: default
+  become: true
+
+  tasks:
+    - name: add apt boundary signing key
+      apt_key:
+        url: https://apt.releases.hashicorp.com/gpg
+        state: present
+
+    - name: add apt boundary repository
+      apt_repository:
+        repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ansible_distribution_release}} main"
+        state: present
+
+    - name: install boundary
+      apt:
+        name: boundary
+        state: present
+
