@@ -91,6 +91,18 @@
         daemon_reload: yes
         enabled: yes
 
+    - name: Check if docker-compose is installed
+      stat:
+        path: /usr/local/bin/docker-compose
+      register: docker_stat
+
+    - name: Install docker-compose
+      get_url:
+        url : https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64
+        dest: /usr/local/bin/docker-compose
+        mode: 'u+x,g+x'
+      when: not docker_stat.stat.exists
+
     - name: Set fact for powershell packages
       set_fact:
         powershell_packages:
