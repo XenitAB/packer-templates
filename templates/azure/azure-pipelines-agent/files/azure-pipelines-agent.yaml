@@ -7,6 +7,7 @@
     - name: Set fact for default packages
       set_fact:
         default_packages:
+          - awscli
           - ca-certificates
           - curl
           - jq
