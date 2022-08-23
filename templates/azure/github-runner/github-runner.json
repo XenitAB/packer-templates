@@ -19,7 +19,7 @@
       "os_type": "Linux",
       "image_publisher": "Canonical",
       "image_offer": "UbuntuServer",
-      "image_sku": "18.04-LTS",
+      "image_sku": "22.04-LTS",
       "vm_size": "Standard_DS2_v2"
     }
   ],
