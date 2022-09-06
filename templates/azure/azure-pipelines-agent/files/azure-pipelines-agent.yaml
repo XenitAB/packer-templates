@@ -34,6 +34,24 @@
         state: present
         update_cache: yes
 
+    # Extra dependecies for 22.04
+    - name: LINUX - SETUP - Ubuntu 22.04 - Install dependencies
+      apt:
+        name: [libicu70, liblttng-ust1]
+        state: present
+        update_cache: true
+
+    # This is required because Ubuntu 22.04 does not have libssl1 anymore but the agent requires it
+    - name: LINUX - SETUP - Ubuntu 22.04 - WORKAROUND dependencies
+      apt:
+        deb: http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1l-1ubuntu1.3_amd64.deb
+    - name: LINUX - SETUP - Ubuntu 22.04 - WORKAROUND Comment out openssl_conf
+      lineinfile:
+        dest: /etc/ssl/openssl.cnf
+        regexp: '^openssl_conf = openssl_init'
+        line: '#openssl_conf = openssl_init'
+        state: present
+
     - name: Set fact for azure-cli prerequisite packages
       set_fact:
         azure_cli_prereq_packages:
